@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Index</title>
+  <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular.min.js'/></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-route.min.js"></script>
+  <script type= "text/javascript">
+
+    var myApp = angular.module('myApp', ['ngRoute'] );
+    myApp.config(function ($routeProvider){
+      $routeProvider
+      .when('/', {
+        templateUrl: 'partials/customizeUsers.html'
+      })
+      .when('/partial2', {
+        templateUrl: 'partials/userList.html'
+      })
+      .otherwise({
+        redirectTo: '/'
+      });
+    });
+
+    //USER FACTORY
+    myApp.factory('userFactory', function(){
+      var users = [];
+      var factory = {};
+
+      factory.addUser = function (user){
+        users.push(user);
+        console.log(users);
+      }
+
+      factory.removeUser = function (user){
+        for(var u in users){
+          if(users[u] == user){
+            users.splice(u,1);
+          }
+        }
+      }
+
+      //METHOD 1
+      factory.getUsers = function (callback){
+        callback(users);
+      }
+
+      //METHOD 2
+      // factory.getUser = function () {
+      //   return users;
+      // }
+
+      return factory
+    })
+
+
+    //USER CONTROLLER 1
+    myApp.controller('usersController', function ($scope, userFactory){
+      $scope.users = [];
+
+      $scope.addUser = function (){
+        $scope.users.push($scope.newUser);
+        userFactory.addUser($scope.newUser);
+        console.log($scope.users);
+        $scope.newUser = {};
+      }
+
+       $scope.removeUser = function (user){
+        $scope.users.splice($scope.users.indexOf(user), 1);
+        userFactory.removeUser(user);
+      }
+
+      // $scope.users = userFactory.getUser()
+
+    })
+
+    //USER CONTROLLER 2
+    myApp.controller('bitchesController', function ($scope, userFactory){
+      $scope.users = [];
+
+      //METHOD 1
+      userFactory.getUsers(function (data){
+        $scope.users = data;
+        console.log($scope.users)
+      })
+
+      //METHOD 2
+      // $scope.users = userFactory.getUser()
+
+    })
+
+  </script>
+</head>
+<body>
+  <div ng-app='myApp'>
+    <a href="#/">Customizing Users</a> | <a href="#/partial2">List of Users</a>
+    <div ng-view=''></div>
+  </div>
+</body>
+</html>
